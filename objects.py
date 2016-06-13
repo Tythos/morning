@@ -5,28 +5,42 @@
 
 class Model(object):
     def __init__(self):
-        self._cores = []
-        self._secondaries = []
         self._constraints = []
+    
+    def _getCores(self):
+        cores = {}
+        for k,v in self.__dict__.iteritems():
+            if isinstance(v, Core):
+                cores[k] = v
+        return cores
         
-    def getattr(self, name):
-        pass
+    def _getAuxes(self):
+        auxes = {}
+        for k,v in self.__dict__iteritems():
+            if isinstance(v, Aux):
+                auxes[k] = v
+        return auxes
         
-    def setattr(self, name, value):
-        pass
+    def __setattr__(self, name, value):
+        if name in self._getCores():
+            prop = getattr(self, name)
+            prop.value = value
+        else:
+            super(Model, self).__setattr__(name, value)
         
-    def _addCore(self, symbol, name=None, value=0., units=None, err=None):
-        pass
-        
-    def _addSecondary(self, symbol, name=None, units=None, relationship=None):
-        pass
-        
-    def _addConstraint(self, constraint):
-        pass
+class Core(object):
+    def __init__(self, name=None, value=None, units=None, err=None):
+        self.name = name
+        self.value = value
+        self.units = units
+        self.err = err
 
-class Property(object):
-    def __init__(self):
-        self.name = None
-        self.value = None
-        self.units = None
-        self.err = None
+class Aux(object):
+    def __init__(self, name=None, relationship=None):
+        self.name = name
+        self.relationship = relationship
+        
+class Uncert(object):
+    def __init__(self, value=0, isAbs=True):
+        self.value = value
+        self.isAbs = isAbs
